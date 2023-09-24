@@ -63,6 +63,8 @@ Left in the queue is the break section’s time worth of break music to lead the
 
 To use this application yourself:
 
+0. At the top of this page, click "Code", "Download as ZIP", and open the ZIP file to extract the contents
+
 1. Create a Spotify app
     
     Because Spotify has not yet accepted my application for their “extended quota mode”, I would have to authorize each individual user before they could connect to my app and thus to Spotify’s API. To create your own Spotify app to run the Pomodoro program,
