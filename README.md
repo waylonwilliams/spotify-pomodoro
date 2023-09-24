@@ -135,3 +135,5 @@ To use this application yourself:
 Possible issues:
 
 Spotify sometimes won’t recognize your device as a “device” even after you open Spotify. If the application is still not working even after you have opened Spotify, try pressing play to register it as a device.
+
+Spotify does not have control over volume on devices which do not have in-app volume, thus you may hear the skipping when the queue is clearing on mobile and other devices without in-app volume
