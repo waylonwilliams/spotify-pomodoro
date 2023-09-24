@@ -108,7 +108,7 @@ To use this application yourself:
     In your terminal change your directory to be of the downloaded program, something like
     
     ```bash
-    cd Downloads/spotify_pomodoro
+    cd Downloads/spotify_pomodoro-main
     ```
     
     Run the following command in your terminal
