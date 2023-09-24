@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <div class="top">Spotify Pomodoro Timer</div>
+
+    <form id="entire_form" action="/process" method="POST">
+        <div class="column" id="left">
+        <label for="study_link">Link to study music:</label>
+        <input type="text" id="study_link" name="study_link" placeholder="Any artist, playlist, album, song. Leave blank for no music">
+        
+        <label for="study_time">Study time:</label>
+        <input type="text" id="study_time" name="study_time" placeholder="Section length in minutes, positive integer" required>
+        </div>
+        
+        <div class="column" id="right">
+        <label for="break_link">Link to break music:</label>
+        <input type="text" id="break_link" name="break_link" placeholder="Ex: https://open.spotify.com/playlist/5Ab86LUH5BNUBGqpCrQxWV?si=cccdcb838d3f4e82">
+        
+        <label for="break_time">Break time:</label>
+        <input type="text" id="break_time" name="break_time" placeholder="Ex: 5, traditional pomodoro is 25 minute study and 5 minute break" required>
+        </div>
+        </div>
+        
+        <div id="button">
+        <button type="submit">Start Pomodoro</button>
+    </form>
+    <br>
+    <div class="bottom_text">You must have Spotify open for the timer to start</div>
+</body>
+</html>

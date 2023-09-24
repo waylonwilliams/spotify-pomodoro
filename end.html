@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+    <div class="top">Take a long break and start another Pomodoro when ready</div>
+
+    <button id="Restart">Start another</button>
+
+    <script>
+        // redirects user to start when they want to start a new timer loop
+        const button = document.getElementById("Restart");
+        button.addEventListener('click', function() {
+            fetch("/authorize", {method: "POST"}) // maybe go to "/" instead, just in order to completely wipe
+            .then(response=> {
+                if (response.ok) {
+                    window.location.href = '/authorize'; // check if this block is necessary
+                }
+            });
+        });
+    </script>
+</body>
+</html>
