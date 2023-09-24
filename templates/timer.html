@@ -21,12 +21,9 @@
         // runs functions in async so timer completes before refreshing
         (async ()=> {
             await update_timer_display();
-            console.log("First timer done");
             for (let i = 0; i < 6; i++) {
                 await fetch_timer();
-                console.log("Timer updated? ");
                 await update_timer_display();
-                console.log("second timer going");
             }
             await fetch("/finished_timer", {method:"GET"})
             .then(response=> {
@@ -40,8 +37,6 @@
         async function update_timer_display() {
             return new Promise((response)=> {
                 var timer_value = document.getElementById("both").textContent;
-                console.log("New timer value below");
-                console.log(timer_value);
                 var timer_seconds = (parseInt(timer_value.split(":")[0], 10)) * 60 -1;
                 var inc = 0;
 
