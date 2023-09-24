@@ -1,8 +1,3 @@
-# future
-# hosting on website
-# extended quota on spotify for universal use
-# podcasts as a data type
-
 from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, url_for, session, request, redirect, render_template, jsonify
 import time
