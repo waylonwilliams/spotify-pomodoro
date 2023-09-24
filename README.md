@@ -1,4 +1,4 @@
-# Spotify Pomodoro Player
+# Pomodoro Spotify Player
 
 Pomodoro is a productivity strategy in which the user focuses on a task deeply for a period(usually 25 minutes), takes a short break(usually 5 minutes), and repeats this cycle 4 times before taking a longer break.
 
