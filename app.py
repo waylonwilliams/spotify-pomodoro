@@ -79,7 +79,6 @@ def process():
     for i in queue_info["queue"]:
         requests.post(skip_url, headers=headers)
         if i["uri"] == temp_uri:
-            print("queue cleared ")
             break
 
     # pauses music and queues music for study and break periods
@@ -91,7 +90,6 @@ def process():
     for i in range(4):
         qq_songs(study_tracks, session["study_time"], headers)
         qq_songs(break_tracks, session["break_time"], headers)
-    print("songs queued")
     
     # begins playings music, or pauses if that is what user inputted
     response = requests.get(queue_url, headers=headers)
@@ -100,11 +98,9 @@ def process():
         requests.post(skip_url, headers=headers)
         requests.put(pause_url, headers=headers)
         requests.put(volume_url.format(previous_volume_num), headers=headers)
-        print("Should be paused first section")
         return render_template("timer.html", timer_val = session["study_time"])
     requests.post(skip_url, headers=headers)
     requests.put(volume_url.format(previous_volume_num), headers=headers)
-    print("not paused first section")
 
     # opens the timer, the timing is handled in javascript
     return render_template("timer.html", timer_val = session["study_time"])
@@ -123,7 +119,6 @@ def get_timer():
     # checks whether a break or study session is next
     # javascript handles whether the next break is a long break
     if session["next_block"]: # if break
-        print("switching to break")
         # holds info for what next section is, flipping between study and break
         session["next_block"] = False
         timer_val = session["break_time"]
@@ -132,17 +127,13 @@ def get_timer():
         queue_info = response.json()
         if queue_info["queue"][0]["uri"] == second_temp_uri:
             response = requests.post(skip_url, headers=headers)
-            print("Skip 1 if pausing: ", response)
             response = requests.put(pause_url, headers=headers)
-            print("pause if pausing: ", response)
             return jsonify({"timer_val": timer_val, "text_val": "Short Break"})
         # skip to get to next sections music
         response = requests.post(skip_url, headers=headers)
-        print("skip 2 if not pausing: ", response)
         return jsonify({"timer_val": timer_val, "text_val": "Short Break"})
     else:
         # same as above just for study section
-        print("Switching to study")
         session["next_block"] = True
         timer_val = session["study_time"]
         response = requests.get(queue_url, headers=headers)
@@ -150,10 +141,8 @@ def get_timer():
         if queue_info["queue"][0]["uri"] == second_temp_uri:
             requests.post(skip_url, headers=headers)
             requests.put(pause_url, headers=headers)
-            print("study paused")
             return jsonify({"timer_val": timer_val, "text_val": "Study"})
         requests.post(skip_url, headers=headers)
-        print("study not paused")
         return jsonify({"timer_val": timer_val, "text_val": "Study"})
 
 @app.route("/finished_timer", methods=["GET"])
@@ -169,12 +158,9 @@ def finished_timer():
     queue_info = response.json()
     if queue_info["queue"][0]["uri"] == second_temp_uri:
         requests.post(skip_url, headers=headers)
-        print("final song skipped")
         requests.put(pause_url, headers=headers)
-        print("final song paused")
         return render_template("end.html")
     requests.post(skip_url, headers=headers)
-    print("final section not paused")
     return render_template("end.html")
 
 # refreshes token
