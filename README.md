@@ -1,5 +1,7 @@
 # Pomodoro Spotify Player
 
+For a thorough demo visit [my portfolio](https://waylonwilliams.notion.site/Spotify-Pomodoro-Timer-cd76a6e450324ade8e6dbe16ab96e26e?pvs=4)
+
 Pomodoro is a productivity strategy in which the user focuses on a task deeply for a period(usually 25 minutes), takes a short break(usually 5 minutes), and repeats this cycle 4 times before taking a longer break.
 
 In this application the user is able to ascribe certain Spotify playlists, albums, artists, or songs to play during the study or break periods of their Pomodoro. The user is also able to have their music pause during these periods. My application keeps a timer for each section of the Pomodoro and adjusts playback accordingly. The app is purposefully minimized in functionality and styling to keep the tool distraction free, while still offering user customization to create the best individual productivity. 
