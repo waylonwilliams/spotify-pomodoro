@@ -1,4 +1,4 @@
-# from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyOAuth
 from flask import Flask, url_for, session, request, redirect, render_template, jsonify
 import time
 import requests
@@ -46,7 +46,10 @@ def process():
     # issue: sometimes just opening spotify is not enough, spotify may need user to press play to register as open device
     response = requests.get(current_url, headers=headers)
     if not response.text:
-        return redirect("/")
+
+        return render_template("err.html")
+        return redirect("/") # could reroute to a different error page since toast is too complex with this stack
+    
     # the same request holds info about volume level too
     previous_volume = response.json()
     previous_volume_num = int(previous_volume["device"]["volume_percent"])
