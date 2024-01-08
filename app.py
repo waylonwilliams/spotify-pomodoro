@@ -255,13 +255,7 @@ def newprocess():
     if not response.text:
 
         return render_template("err.html")
-    
-    # store everything from form in session
-    session["study_uri"] = (request.form["study_link"])
-    session["study_time"] = int(request.form["study_time"])
-    session["break_uri"] = (request.form["break_link"])
-    session["break_time"] = int(request.form["break_time"])
-    session["next_block"] = True # true for break, false for study
+
 
     # queues music for study and break periods
     study_tracks = get_tracks(session["study_uri"], headers)
@@ -280,8 +274,6 @@ def newprocess():
         requests.put(pause_url, headers=headers)
         requests.put(volume_url.format(session["previous_volume"]), headers=headers)
         return render_template("timer.html", timer_val = session["study_time"])
-    requests.post(skip_url, headers=headers)
-    requests.put(volume_url.format(session["previous_volume"]), headers=headers)
 
     # opens the timer, the timing is handled in javascript
     return render_template("timer.html", timer_val = session["study_time"])
