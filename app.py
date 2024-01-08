@@ -202,6 +202,7 @@ def starttimer():
 
     # should just queue one song from study playlist / do nothing if skip
     study_tracks = get_tracks(session["study_uri"], headers)
+    queue_single_song(study_tracks, headers)
 
 
 
@@ -420,6 +421,8 @@ def queue_single_song(tracks, headers):
     # queue place holder if pause period
     if tracks == []:
         requests.post(add_to_queue_url.format(second_temp_uri[14:]), headers=headers)
+        return 0
 
-    requests.post(add_to_queue_url.format(tracks[random.randint(0, len(tracks) - 1)][0][14:]), headers=headers)
-    return
+    rand_track = random.randint(0, len(tracks) - 1)
+    requests.post(add_to_queue_url.format(tracks[rand_track][0][14:]), headers=headers)
+    return tracks[rand_track][1] # returning time to include when queuing in the body
