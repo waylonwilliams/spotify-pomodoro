@@ -149,6 +149,8 @@ def process():
 
 
 
+
+
 # when user presses "start timer" button
 @app.route("/starttimer", methods=["POST"])
 def starttimer():
@@ -169,6 +171,7 @@ def starttimer():
     # the same request holds info about volume level too
     previous_volume = response.json()
     previous_volume_num = int(previous_volume["device"]["volume_percent"])
+    session["previous_volume"] = previous_volume_num
     # sets volume to 0 to not make sound when clearing queue and queueing songs
     requests.put(volume_url.format(0), headers=headers)
 
@@ -199,13 +202,10 @@ def starttimer():
     requests.put(pause_url, headers=headers)
 
 
-
     # should just queue one song from study playlist / do nothing if skip
     study_tracks = get_tracks(session["study_uri"], headers)
-    queue_single_song(study_tracks, headers)
-
-
-
+    # queues one song and keeps its length in the session for calculating size of body
+    session["first_song_length"] = queue_single_song(study_tracks, headers)
 
     
     # begins playings music, or pauses if that is what user inputted
@@ -221,6 +221,84 @@ def starttimer():
 
     # opens the timer, the timing is handled in javascript
     return render_template("timer.html", timer_val = session["study_time"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# when user presses "start timer" button
+@app.route("/newprocess", methods=["GET"])
+def newprocess():
+    # ensuring access token
+    session["token_info"], authorized = get_token()
+    session.modified = True
+    if not authorized:
+        return redirect("/")
+    access_token = session.get("token_info").get("access_token")
+    headers = get_header(access_token)
+
+    #checking if spotify open
+    # issue: sometimes just opening spotify is not enough, spotify may need user to press play to register as open device
+    response = requests.get(current_url, headers=headers)
+    if not response.text:
+
+        return render_template("err.html")
+    
+    # store everything from form in session
+    session["study_uri"] = (request.form["study_link"])
+    session["study_time"] = int(request.form["study_time"])
+    session["break_uri"] = (request.form["break_link"])
+    session["break_time"] = int(request.form["break_time"])
+    session["next_block"] = True # true for break, false for study
+
+    # queues music for study and break periods
+    study_tracks = get_tracks(session["study_uri"], headers)
+    break_tracks = get_tracks(session["break_uri"], headers)
+    first_song_duration = session["first_song_length"]
+    for i in range(4):
+        queue_with_offset(study_tracks, session["study_time"], first_song_duration, headers)
+        first_song_duration = 0 # so it will only consider the offset on the first time
+        qq_songs(break_tracks, session["break_time"], headers)
+    
+    # begins playings music, or pauses if that is what user inputted
+    response = requests.get(queue_url, headers=headers)
+    queue_info = response.json()
+    if queue_info["queue"][0]["uri"] == second_temp_uri:
+        requests.post(skip_url, headers=headers)
+        requests.put(pause_url, headers=headers)
+        requests.put(volume_url.format(session["previous_volume"]), headers=headers)
+        return render_template("timer.html", timer_val = session["study_time"])
+    requests.post(skip_url, headers=headers)
+    requests.put(volume_url.format(session["previous_volume"]), headers=headers)
+
+    # opens the timer, the timing is handled in javascript
+    return render_template("timer.html", timer_val = session["study_time"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -426,3 +504,22 @@ def queue_single_song(tracks, headers):
     rand_track = random.randint(0, len(tracks) - 1)
     requests.post(add_to_queue_url.format(tracks[rand_track][0][14:]), headers=headers)
     return tracks[rand_track][1] # returning time to include when queuing in the body
+
+def queue_with_offset(tracks, time, completed_time, headers):
+    if tracks == []:
+        return
+
+    random_indices = random.sample(range(len(tracks)), len(tracks))
+    total_song_time = completed_time
+    i = 0
+    i_max = len(random_indices)
+
+    while total_song_time < time * 60000:
+        requests.post(add_to_queue_url.format(tracks[random_indices[i]][0][14:]), headers=headers)
+        total_song_time += tracks[i][1]
+        i += 1
+        if i == i_max:
+            i = 0
+            # if the playlist has been completely looped through, create a unique shuffle for the next loop
+            random_indices = random.sample(range(len(tracks)), len(tracks))
+    return
