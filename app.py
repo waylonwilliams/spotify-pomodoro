@@ -31,6 +31,35 @@ def authorize():
     # redirects user to my home page
     return render_template("index.html")
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # when user presses "start timer" button
 @app.route("/process", methods=["POST"])
 def process():
@@ -73,7 +102,7 @@ def process():
     # queued by spotify
     response = requests.get(queue_url, headers=headers)
     queue_info = response.json()
-    # iterates the queue until the song i queued is found, clears all user-queued songs
+    # iterates fthe queue until the song i queued is found, clears all user-queued songs
     for i in queue_info["queue"]:
         requests.post(skip_url, headers=headers)
         if i["uri"] == temp_uri:
@@ -102,6 +131,137 @@ def process():
 
     # opens the timer, the timing is handled in javascript
     return render_template("timer.html", timer_val = session["study_time"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# when user presses "start timer" button
+@app.route("/starttimer", methods=["POST"])
+def starttimer():
+    # ensuring access token
+    session["token_info"], authorized = get_token()
+    session.modified = True
+    if not authorized:
+        return redirect("/")
+    access_token = session.get("token_info").get("access_token")
+    headers = get_header(access_token)
+
+    #checking if spotify open
+    # issue: sometimes just opening spotify is not enough, spotify may need user to press play to register as open device
+    response = requests.get(current_url, headers=headers)
+    if not response.text:
+        return render_template("err.html")
+    
+    # the same request holds info about volume level too
+    previous_volume = response.json()
+    previous_volume_num = int(previous_volume["device"]["volume_percent"])
+    # sets volume to 0 to not make sound when clearing queue and queueing songs
+    requests.put(volume_url.format(0), headers=headers)
+
+    # html inputs -> flask session storage
+    session["study_uri"] = (request.form["study_link"])
+    session["study_time"] = int(request.form["study_time"])
+    session["break_uri"] = (request.form["break_link"])
+    session["break_time"] = int(request.form["break_time"])
+    session["next_block"] = True # true for break, false for study
+
+
+    # queues a placeholder song which signals the end of the user's queue
+    response = requests.post(add_to_queue_url.format(temp_uri[14:]), headers=headers)
+
+    # retrieves the queue, the reason i had to queue the song is because spotify normally
+    # generates an endless queue for the user, so I only need to clear the songs manually queued
+    # by the user because the songs i queue in the future will go ahead of the songs automatically
+    # queued by spotify
+    response = requests.get(queue_url, headers=headers)
+    queue_info = response.json()
+    # iterates fthe queue until the song i queued is found, clears all user-queued songs
+    for i in queue_info["queue"]:
+        requests.post(skip_url, headers=headers)
+        if i["uri"] == temp_uri:
+            break
+
+    # pauses music and queues music for study and break periods
+    requests.put(pause_url, headers=headers)
+
+
+
+    # should just queue one song from study playlist / do nothing if skip
+    study_tracks = get_tracks(session["study_uri"], headers)
+
+
+
+
+    
+    # begins playings music, or pauses if that is what user inputted
+    response = requests.get(queue_url, headers=headers)
+    queue_info = response.json()
+    if queue_info["queue"][0]["uri"] == second_temp_uri:
+        requests.post(skip_url, headers=headers)
+        requests.put(pause_url, headers=headers)
+        requests.put(volume_url.format(previous_volume_num), headers=headers)
+        return render_template("timer.html", timer_val = session["study_time"])
+    requests.post(skip_url, headers=headers)
+    requests.put(volume_url.format(previous_volume_num), headers=headers)
+
+    # opens the timer, the timing is handled in javascript
+    return render_template("timer.html", timer_val = session["study_time"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # runs when timer reaches 0 to reset timer
 @app.route("/get_timer", methods=["POST"])
@@ -254,4 +414,12 @@ def qq_songs(tracks, time, headers):
             i = 0
             # if the playlist has been completely looped through, create a unique shuffle for the next loop
             random_indices = random.sample(range(len(tracks)), len(tracks))
+    return
+
+def queue_single_song(tracks, headers):
+    # queue place holder if pause period
+    if tracks == []:
+        requests.post(add_to_queue_url.format(second_temp_uri[14:]), headers=headers)
+
+    requests.post(add_to_queue_url.format(tracks[random.randint(0, len(tracks) - 1)][0][14:]), headers=headers)
     return
