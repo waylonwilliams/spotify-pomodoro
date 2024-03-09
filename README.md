@@ -15,12 +15,12 @@ Sometimes I listen to music when I study, sometimes I use the pomodoro technique
 
 ## How to use
 
-
 Clone the repository and run the app locally using the following commands
 
 ```
-git clone https://github.com/waylonwilliams/ai-database-manager.git
-cd ai-database-manager
-npm install
-npm run dev
+git clone https://github.com/waylonwilliams/spotify-pomodoro.git
+cd spotify-pomodoro
+flask run
 ```
+
+Then, when prompted, input your Spotify app credentials to allow the app to interact with the Spotify API
