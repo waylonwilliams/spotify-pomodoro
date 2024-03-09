@@ -20,6 +20,7 @@ Clone the repository and run the app locally using the following commands
 ```
 git clone https://github.com/waylonwilliams/spotify-pomodoro.git
 cd spotify-pomodoro
+pip install -r requirements.txt
 flask run
 ```
 
